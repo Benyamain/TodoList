@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react"
-import "./styles.css"
 import { NewTodoForm } from "./NewTodoForm"
+import "./styles.css"
+import { TodoList } from "./TodoList"
 
 export default function App() {
-  // Can only return one element
-  // Destructoring
-  // Runs the component as an iterative process
   const [todos, setTodos] = useState(() => {
     const localValue = localStorage.getItem("ITEMS")
-    if (localValue !== null) return []
+    if (localValue == null) return []
 
     return JSON.parse(localValue)
   })
@@ -17,12 +15,20 @@ export default function App() {
     localStorage.setItem("ITEMS", JSON.stringify(todos))
   }, [todos])
 
+  function addTodo(title) {
+    setTodos(currentTodos => {
+      return [
+        ...currentTodos,
+        { id: crypto.randomUUID(), title, completed: false },
+      ]
+    })
+  }
+
   function toggleTodo(id, completed) {
     setTodos(currentTodos => {
       return currentTodos.map(todo => {
         if (todo.id === id) {
-          // Changing state by creating a new state object
-          return { ...todo, completed}
+          return { ...todo, completed }
         }
 
         return todo
@@ -36,19 +42,11 @@ export default function App() {
     })
   }
 
-  function addTodo(title) {
-    // Spreading '...'
-        setTodos((currentTodos) => {
-          return [...todos, { id: crypto.randomUUID(), title, completed: false },
-          ]
-        })
-  }
-
   return (
     <>
-    <NewTodoForm onSubmit={addTodo} />
-  <h1 className="header">Todo List</h1>
-  <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo} />
-  </>
+      <NewTodoForm onSubmit={addTodo} />
+      <h1 className="header">Todo List</h1>
+      <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo} />
+    </>
   )
 }
